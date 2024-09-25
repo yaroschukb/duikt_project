@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - "22" # Виберіть версію Node.js (можна використовувати новішу, якщо необхідно)
+
+cache:
+  directories:
+    - node_modules # Кешування залежностей для прискорення процесу збірки
+
+branches:
+  only:
+    - maшт # Запуск Travis CI тільки для гілки master (можна змінити на main або інші)
+
+install:
+  - npm install # Встановлення всіх залежностей, визначених у package.json
+
+script:
+  - npm run lint # Лінтинг для перевірки якості коду (в залежності від вашого npm script)
+  - npm test # Запуск тестів, визначених у package.json (npm test)
+
+notifications:
+  email:
+    recipients:
+      - gitmongonode2022@gmail.com # Замініть на вашу електронну пошту
+    on_success: change # Отримувати повідомлення лише у разі зміни статусу (наприклад, після успішного виправлення помилки)
+    on_failure: always # Отримувати повідомлення при будь-якій невдачі збірки

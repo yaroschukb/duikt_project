@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - "22" # Виберіть версію Node.js (можна використовувати новішу, якщо це необхідно)
+
+cache:
+  directories:
+    - node_modules
+branches:
+  only:
+    - main # Запуск Travis CI тільки для гілки master (можна змінити на main або інші)
+
+before_install:
+  - npm install -g @angular/cli # Встановлення Angular CLI
+
+install:
+  - npm install # Встановлення залежностей
+
+script:
+  - ng lint # Лінтинг для перевірки якості коду
+  - ng test --watch=false --browsers=ChromeHeadless # Запуск тестів в headless режимі
+  - ng build # Збірка проєкту в production режимі
+
+# Повідомлення про результат збірки через email
+notifications:
+  email:
+    recipients:
+      - gitmongonode2022@gmail.com # Замініть на свою електронну пошту
+    on_success: change
+    on_failure: always
