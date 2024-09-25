@@ -7,7 +7,7 @@ cache:
     - node_modules
 branches:
   only:
-    - main # Запуск Travis CI тільки для гілки master (можна змінити на main або інші)
+    - master # Запуск Travis CI тільки для гілки master (можна змінити на main або інші)
 
 before_install:
   - npm install -g @angular/cli # Встановлення Angular CLI

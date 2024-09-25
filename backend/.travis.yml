@@ -8,7 +8,7 @@ cache:
 
 branches:
   only:
-    - maшт # Запуск Travis CI тільки для гілки master (можна змінити на main або інші)
+    - master # Запуск Travis CI тільки для гілки master (можна змінити на main або інші)
 
 install:
   - npm install # Встановлення всіх залежностей, визначених у package.json
