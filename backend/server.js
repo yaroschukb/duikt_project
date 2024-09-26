@@ -14,6 +14,22 @@ const upload = multer({ storage });
 
 app.use(cors());
 
+// Шлях до папки зі зібраним Angular-проєктом
+const distDir = path.join(__dirname, "dist/compress-app");
+
+// Налаштування віддачі статичних файлів Angular
+app.use(express.static(distDir));
+
+// Перевірка наявності папки 'compressed', створення, якщо не існує
+const compressedDir = path.join(__dirname, "compressed");
+if (!fs.existsSync(compressedDir)) {
+  fs.mkdirSync(compressedDir);
+}
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distDir, "./browser/index.html"));
+});
+
 // Обробка запиту для завантаження і стиснення зображення
 app.post("/upload", upload.single("image"), (req, res) => {
   const file = req.file;
@@ -22,11 +38,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
     return res.status(400).send("Немає файлу для завантаження");
   }
 
-  const outputPath = path.join(
-    __dirname,
-    "compressed",
-    `${Date.now()}-compressed.jpg`
-  );
+  const outputPath = path.join(compressedDir, `${Date.now()}-compressed.jpg`);
 
   sharp(file.buffer)
     .resize({ width: 800 }) // Зміна розміру
@@ -35,7 +47,14 @@ app.post("/upload", upload.single("image"), (req, res) => {
       if (err) {
         return res.status(500).send("Помилка стиснення зображення");
       }
-      res.send(`Зображення успішно стиснене: ${info}`);
+      // Відправлення стисненого зображення клієнту
+      res.sendFile(outputPath, (err) => {
+        if (err) {
+          return res.status(500).send("Помилка відправлення зображення");
+        }
+        // Видалення стисненого файлу після відправлення
+        fs.unlinkSync(outputPath);
+      });
     });
 });
 
