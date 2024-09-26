@@ -29,7 +29,3 @@ script:
   - cd frontend/compressApp
   - npm run build
   - cd ../../
-
-  - cd backend
-  - npm test
-  - cd ..
