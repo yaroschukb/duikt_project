@@ -1,0 +1,35 @@
+language: node_js
+node_js:
+  - "22" # Версія Node.js
+
+cache:
+  directories:
+    - frontend/node_modules
+    - backend/node_modules
+
+branches:
+  only:
+    - main
+
+before_install:
+  - cd frontend
+  - npm install -g @angular/cli
+  - cd ..
+
+install:
+  - cd frontend/compressApp
+  - npm install
+  - cd ../../backend
+  - npm install
+  - cd ..
+
+script:
+  # Збірка frontend
+  - cd frontend/compressApp
+  - npm run build
+  - cd ../../
+
+  # Запуск тестів backend (якщо вони є)
+  - cd backend
+  - npm test
+  - cd ..
