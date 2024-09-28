@@ -15,7 +15,7 @@ const upload = multer({ storage });
 app.use(cors());
 
 // Шлях до папки зі зібраним Angular-проєктом
-const distDir = path.join(__dirname, "dist/compress-app");
+const distDir = path.join(__dirname, "browser");
 
 // Налаштування віддачі статичних файлів Angular
 app.use(express.static(distDir));
@@ -27,7 +27,7 @@ if (!fs.existsSync(compressedDir)) {
 }
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(distDir, "./browser/index.html"));
+  res.sendFile(path.join(distDir, "index.html"));
 });
 
 // Обробка запиту для завантаження і стиснення зображення
