@@ -34,7 +34,7 @@ script:
   - cd ../../
 
   # Створення Docker-образу
-  - docker build -t gcr.io/$GCP_PROJECT_ID/compress-app-img .
+  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img .
 
 after_success:
   # Декодування ключа облікового запису служби Google Cloud
