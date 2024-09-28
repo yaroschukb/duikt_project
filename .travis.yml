@@ -43,7 +43,7 @@ after_success:
   # Аутентифікація у Google Cloud
   - gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
   - gcloud --quiet config set project $GCP_PROJECT_ID
-  - gcloud auth configure-docker --quiet
+  - gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
 
-  # Пуш Docker-образу у Google Container Registry
-  - docker push gcr.io/$GCP_PROJECT_ID/compress-app-img
+  # Пуш Docker-образу у Google Artifact Registry
+  - docker push $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img
