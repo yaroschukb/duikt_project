@@ -1,7 +1,9 @@
-dist: focal
 language: node_js
 node_js:
-  - "18"
+  - "18" # Виберіть версію Node.js
+
+services:
+  - docker
 
 cache:
   directories:
@@ -13,19 +15,38 @@ branches:
     - main
 
 before_install:
-  - npm config set progress false || true
-  - cd frontend
   - npm install -g @angular/cli
-  - cd ..
 
 install:
-  - cd frontend/compressApp
+  - cd frontend
   - npm install
-  - cd ../../backend
+  - cd ../backend
   - npm install
   - cd ..
 
 script:
-  - cd frontend/compressApp
+  # Збірка frontend та запуск тестів
+  - cd frontend
   - npm run build
-  - cd ../../
+  - npm test
+  - cd ..
+
+  # Запуск тестів backend
+  - cd backend
+  - npm test
+  - cd ..
+
+  # Створення Docker-образу
+  - docker build -t gcr.io/$GCP_PROJECT_ID/compress-app-img .
+
+after_success:
+  # Декодування ключа облікового запису служби Google Cloud
+  - echo "$GCLOUD_SERVICE_KEY" | base64 --decode > ${HOME}/gcloud-service-key.json
+
+  # Аутентифікація у Google Cloud
+  - gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+  - gcloud --quiet config set project $GCP_PROJECT_ID
+  - gcloud auth configure-docker
+
+  # Пуш Docker-образу у Google Container Registry
+  - docker push gcr.io/$GCP_PROJECT_ID/compress-app-img
