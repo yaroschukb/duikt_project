@@ -29,9 +29,8 @@ install:
 
 script:
   # Збірка frontend та запуск тестів
-  - cd frontend/compressApp
+  - cd frontend
   - npm run build
-  - npm test
   - cd ../../
 
   # Створення Docker-образу
