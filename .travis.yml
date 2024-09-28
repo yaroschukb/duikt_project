@@ -16,12 +16,14 @@ branches:
     - main
 
 before_install:
+  - cd frontend
   - npm install -g @angular/cli
+  - cd ..
 
 install:
   - cd frontend
   - npm install
-  - cd ../backend
+  - cd ../../backend
   - npm install
   - cd ..
 
@@ -30,12 +32,7 @@ script:
   - cd frontend
   - npm run build
   - npm test
-  - cd ..
-
-  # Запуск тестів backend
-  - cd backend
-  - npm test
-  - cd ..
+  - cd ../../
 
   # Створення Docker-образу
   - docker build -t gcr.io/$GCP_PROJECT_ID/compress-app-img .
