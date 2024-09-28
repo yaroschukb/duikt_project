@@ -29,7 +29,7 @@ install:
 
 script:
   # Збірка frontend та запуск тестів
-  - cd frontend
+  - cd frontend/compressApp
   - npm run build
   - cd ../../
 
