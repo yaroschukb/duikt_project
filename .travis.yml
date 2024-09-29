@@ -52,7 +52,7 @@ after_success:
     --location=$REGION || echo "Репозиторій вже існує"
 
   # Тегування Docker-образу
-  - docker tag $LOCAL_IMAGE_NAME $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
+  - docker tag $LOCAL_IMAGE_NAME $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app:latest
 
   # Пуш Docker-образу у Google Artifact Registry
-  - docker push $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
+  - docker push $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app:latest
