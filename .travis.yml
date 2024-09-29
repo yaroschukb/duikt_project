@@ -1,7 +1,7 @@
 dist: focal
 language: node_js
 node_js:
-  - "18" # Виберіть версію Node.js
+  - "18"
 
 services:
   - docker
@@ -30,13 +30,12 @@ install:
 script:
   # Збірка frontend та запуск тестів
   - cd frontend/compressApp
+  - npm test
   - npm run build
   - cd ../../
 
   # Створення Docker-образу
-  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img .
-  # Тегування образу
-  - docker tag $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:compressapp
+  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app .
 
 after_success:
   # Декодування ключа облікового запису служби Google Cloud
@@ -47,12 +46,10 @@ after_success:
   - gcloud --quiet config set project $GCP_PROJECT_ID
   - gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
 
-  # Створення репозиторію (пропустіть цей крок, якщо репозиторій вже створений)
+  # Створення репозиторію
   - gcloud artifacts repositories create $REPOSITORY_NAME \
     --repository-format=docker \
     --location=$REGION || echo "Репозиторій вже існує"
-
-  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img .
 
   # Тегування Docker-образу
   - docker tag $LOCAL_IMAGE_NAME $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest

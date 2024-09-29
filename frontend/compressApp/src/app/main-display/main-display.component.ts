@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NzContentComponent, NzLayoutModule } from 'ng-zorro-antd/layout';
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { SiderComponent } from './sider/sider.component';
 import { FooterComponent } from './footer/footer.component';
 import { ContainerComponent } from './container/container.component';
@@ -16,6 +16,8 @@ import { HeaderComponent } from './header/header.component';
     HeaderComponent,
   ],
   templateUrl: './main-display.component.html',
-  styleUrl: './main-display.component.scss',
+  styleUrls: ['./main-display.component.scss'], // Виправлено тут
 })
-export class MainDisplayComponent {}
+export class MainDisplayComponent {
+  constructor() {}
+}

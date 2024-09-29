@@ -30,4 +30,8 @@ export class ApiService {
     }
     return throwError(() => new Error(errorMessage));
   }
+
+  getTestData(): string[] {
+    return ['data1', 'data2', 'data3'];
+  }
 }
