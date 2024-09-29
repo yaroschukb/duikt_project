@@ -46,9 +46,16 @@ after_success:
   - gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
   - gcloud --quiet config set project $GCP_PROJECT_ID
   - gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
-  - gcloud artifacts repositories create lab4-imgs \
+
+  # Створення репозиторію (пропустіть цей крок, якщо репозиторій вже створений)
+  - gcloud artifacts repositories create $REPOSITORY_NAME \
     --repository-format=docker \
-    --location=$REGION
+    --location=$REGION || echo "Репозиторій вже існує"
+
+  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img .
+
+  # Тегування Docker-образу
+  - docker tag $LOCAL_IMAGE_NAME $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
 
   # Пуш Docker-образу у Google Artifact Registry
   - docker push $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
