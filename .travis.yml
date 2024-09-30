@@ -13,7 +13,7 @@ cache:
 
 branches:
   only:
-    - main
+    - main # Запуск тільки при пуші в гілку main
 
 before_install:
   - cd frontend
@@ -35,27 +35,14 @@ script:
   - cd ../../
 
   # Створення Docker-образу
-  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest .
+  - docker build -t $DOCKER_USERNAME/compress-app:latest .
 
 after_success:
-  # Декодування ключа облікового запису служби Google Cloud
-  - echo "$GCLOUD_SERVICE_KEY" | base64 --decode > ${HOME}/gcloud-service-key.json
-
-  # Аутентифікація у Google Cloud
-  - gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-  - gcloud --quiet config set project $GCP_PROJECT_ID
-  - gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
-
-  # Створення репозиторію (якщо не існує)
-  - |
-    if ! gcloud artifacts repositories describe $REPOSITORY_NAME --location=$REGION > /dev/null 2>&1; then
-      gcloud artifacts repositories create $REPOSITORY_NAME \
-        --repository-format=docker \
-        --location=$REGION
-    fi
+  # Логін до Docker Hub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
   # Тегування Docker-образу
-  - docker tag $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
+  - docker tag $DOCKER_USERNAME/compress-app:latest $DOCKER_USERNAME/compress-app:latest
 
-  # Пуш Docker-образу у Google Artifact Registry
-  - docker push $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
+  # Пуш Docker-образу у Docker Hub
+  - docker push $DOCKER_USERNAME/compress-app:latest
