@@ -46,10 +46,5 @@ after_success:
   - gcloud --quiet config set project $GCP_PROJECT_ID
   - gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
 
-  # Створення репозиторію
-  - gcloud artifacts repositories create $REPOSITORY_NAME \
-    --repository-format=docker \
-    --location=$REGION || echo "Репозиторій вже існує"
-
   # Пуш Docker-образу у Google Artifact Registry
   - docker push $LOCAL_IMAGE_NAME
