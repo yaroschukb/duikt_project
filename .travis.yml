@@ -35,7 +35,7 @@ script:
   - cd ../../
 
   # Створення Docker-образу
-  - docker build -t $LOCAL_IMAGE_NAME .
+  - docker build -t $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img .
 
 after_success:
   # Декодування ключа облікового запису служби Google Cloud
@@ -45,6 +45,12 @@ after_success:
   - gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
   - gcloud --quiet config set project $GCP_PROJECT_ID
   - gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
+  - gcloud artifacts repositories create $REPOSITORY_NAME \
+    --repository-format=docker \
+    --location=$REGION || echo "Репозиторій вже існує"
+
+  # Тегування Docker-образу
+  - docker tag $LOCAL_IMAGE_NAME $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
 
   # Пуш Docker-образу у Google Artifact Registry
-  - docker push $LOCAL_IMAGE_NAME
+  - docker push $REGION-docker.pkg.dev/$GCP_PROJECT_ID/$REPOSITORY_NAME/compress-app-img:latest
