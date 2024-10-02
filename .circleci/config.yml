@@ -49,7 +49,7 @@ jobs:
 
       # Створення Docker-образу
       - setup_remote_docker:
-          version: 20.10.7
+          version: "default"
       - run:
           name: Build Docker Image
           command: docker build -t $DOCKER_USERNAME/compress-app:latest .
