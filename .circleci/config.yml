@@ -10,8 +10,8 @@ jobs:
       # Кешування node_modules
       - restore_cache:
           keys:
-            - v1-frontend-node-modules-{{ checksum "frontend/package-lock.json" }}
-            - v1-backend-node-modules-{{ checksum "backend/package-lock.json" }}
+            - v1-frontend-node-modules-{{ checksum "frontend/compressApp/package.json" }}
+            - v1-backend-node-modules-{{ checksum "backend/package.json" }}
 
       # Встановлення залежностей та підготовка середовища
       - run:
@@ -26,17 +26,17 @@ jobs:
           name: Install Dependencies
           command: |
             cd frontend/compressApp
-            npm install
+            npm install --no-package-lock
             cd ../../backend
-            npm install
+            npm install --no-package-lock
             cd ..
 
       # Збереження кешу
       - save_cache:
           paths:
-            - frontend/node_modules
+            - frontend/compressApp/node_modules
             - backend/node_modules
-          key: v1-frontend-node-modules-{{ checksum "frontend/package-lock.json" }}-backend-node-modules-{{ checksum "backend/package-lock.json" }}
+          key: v1-frontend-node-modules-{{ checksum "frontend/compressApp/package.json" }}-backend-node-modules-{{ checksum "backend/package.json" }}
 
       # Запуск тестів та збірка frontend
       - run:
@@ -48,25 +48,4 @@ jobs:
             cd ../../
 
       # Створення Docker-образу
-      - setup_remote_docker:
-          version: "default"
-      - run:
-          name: Build Docker Image
-          command: docker build -t $DOCKER_USERNAME/compress-app:latest .
-
-      # Логін у Docker Hub та пуш образу
-      - run:
-          name: Push Docker Image
-          command: |
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            docker tag $DOCKER_USERNAME/compress-app:latest $DOCKER_USERNAME/compress-app:latest
-            docker push $DOCKER_USERNAME/compress-app:latest
-
-workflows:
-  version: 2
-  build_and_push:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only: main
+      - setup_remote_docker: version
