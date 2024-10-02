@@ -18,7 +18,7 @@ jobs:
           name: Install Angular CLI
           command: |
             cd frontend
-            npm install -g @angular/cli
+            npm install @angular/cli
             cd ..
 
       # Встановлення залежностей frontend та backend
