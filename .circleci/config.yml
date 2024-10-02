@@ -3,9 +3,10 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/node:18.17
+      - image: cimg/node:22.9.0
     steps:
       - checkout
+      - run: node --version
 
       # Кешування node_modules
       - restore_cache:
