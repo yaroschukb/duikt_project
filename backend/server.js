@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || "localhost";
 
 // Налаштування multer для зберігання завантажених зображень
 const storage = multer.memoryStorage();
@@ -32,7 +33,7 @@ if (!fs.existsSync(compressedDir)) {
 
 app.get("/api/getphoto", (req, res) => {
   console.log("get photo", req.query);
-  return res.json();
+  return res.status(404);
 });
 
 // Обробка запиту для завантаження і стиснення зображення
@@ -65,5 +66,5 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Сервер працює на порту ${PORT}`);
+  console.log(`Server is running on http://${HOST}:${PORT}`);
 });
