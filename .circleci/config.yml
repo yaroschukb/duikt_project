@@ -8,12 +8,6 @@ jobs:
       - checkout
       - run: node --version
 
-      # Кешування node_modules
-      - restore_cache:
-          keys:
-            - v1-frontend-node-modules-{{ checksum "frontend/package-lock.json" }}
-            - v1-backend-node-modules-{{ checksum "backend/package-lock.json" }}
-
       # Встановлення залежностей та підготовка середовища
       - run:
           name: Install Angular CLI
@@ -37,7 +31,6 @@ jobs:
           paths:
             - frontend/node_modules
             - backend/node_modules
-          key: v1-frontend-node-modules-{{ checksum "frontend/package-lock.json" }}-backend-node-modules-{{ checksum "backend/package-lock.json" }}
       # Установка chrome
       - run:
           name: Install Chrome
