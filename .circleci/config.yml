@@ -26,11 +26,6 @@ jobs:
             npm install --no-package-lock
             cd ..
 
-      # Збереження кешу
-      - save_cache:
-          paths:
-            - frontend/node_modules
-            - backend/node_modules
       # Установка chrome
       - run:
           name: Install Chrome
