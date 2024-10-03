@@ -26,12 +26,18 @@ if (!fs.existsSync(compressedDir)) {
   fs.mkdirSync(compressedDir);
 }
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(distDir, "index.html"));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(distDir, "index.html"));
+// });
+
+app.get("/api/getphoto", (req, res) => {
+  console.log("get photo", req.query);
+  return res.json();
 });
 
 // Обробка запиту для завантаження і стиснення зображення
-app.post("/upload", upload.single("image"), (req, res) => {
+app.post("/api/upload", upload.single("image"), (req, res) => {
+  console.log("upload", req.body.image);
   const file = req.file;
 
   if (!file) {

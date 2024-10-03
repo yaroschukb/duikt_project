@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import {
   HttpClient,
   HttpErrorResponse,
+  HttpEvent,
+  HttpEventType,
   HttpHeaders,
+  HttpResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -14,9 +17,23 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   getCompressedPhoto(): Observable<any> {
-    return this.http.get<any>('api/getphoto').pipe(
+    return this.http.get<any>('/getphoto').pipe(
       catchError(this.handleError) // Обробка помилок
     );
+  }
+
+  uploadImageToServer(data: any): Observable<HttpEvent<any>> {
+    console.log('file in api service', data);
+    const formData = new FormData();
+    formData.append('image', data.file);
+    console.log('formdata in api service', formData);
+    return this.http.post('/api/upload', formData, {
+      reportProgress: true,
+      observe: 'events',
+      headers: new HttpHeaders({
+        enctype: 'multipart/form-data',
+      }),
+    });
   }
 
   private handleError(error: HttpErrorResponse) {

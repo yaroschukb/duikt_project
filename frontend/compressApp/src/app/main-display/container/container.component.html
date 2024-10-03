@@ -1,9 +1,10 @@
 <nz-content>
   <nz-upload
     nzType="drag"
-    [nzMultiple]="true"
-    nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-    (nzChange)="handleChange($event)"
+    nzListType="picture-card"
+    [nzPreview]="handlePreview"
+    [(nzFileList)]="fileList"
+    [nzShowUploadList]="true"
   >
     <p class="ant-upload-drag-icon">
       <span nz-icon nzType="inbox"></span>
@@ -14,4 +15,24 @@
       company data or other band files
     </p>
   </nz-upload>
+  <button
+    nz-button
+    [nzType]="'primary'"
+    [nzLoading]="uploading"
+    (click)="handleUpload()"
+    [disabled]="fileList.length === 0"
+    style="margin-top: 16px"
+  >
+    {{ uploading ? "Uploading" : "Start Upload" }}
+  </button>
+  <nz-modal
+    [nzVisible]="previewVisible"
+    [nzContent]="modalContent"
+    [nzFooter]="null"
+    (nzOnCancel)="previewVisible = false"
+  >
+    <ng-template #modalContent>
+      <img [src]="previewImage" alt="Preview" [ngStyle]="{ width: '100%' }" />
+    </ng-template>
+  </nz-modal>
 </nz-content>
