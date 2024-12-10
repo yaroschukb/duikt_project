@@ -84,7 +84,7 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
   const file = req.file;
 
   if (!file) {
-    return res.status(400).send("Немає файлу для завантаження");
+    return res.status(400).json("Немає файлу для завантаження");
   }
 
   const start = Date.now();
@@ -107,10 +107,10 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
     compressionDurationGauge.set(duration);
     uploadCounter.inc();
 
-    res.status(200).send("Зображення успішно завантажено та стиснуто");
+    res.status(200).json("Зображення успішно завантажено та стиснуто");
   } catch (err) {
     console.error("Помилка стиснення зображення:", err);
-    res.status(500).send("Помилка стиснення зображення");
+    res.status(500).json("Помилка стиснення зображення");
   }
 });
 
@@ -120,6 +120,7 @@ app.get("/api/getphoto", async (req, res) => {
     const images = await Image.find();
 
     const imageBuffers = images.map((image) => ({
+      id: image._id,
       filename: image.filename,
       data: image.data.toString("base64"),
     }));
@@ -142,10 +143,10 @@ app.post("/api/user", async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).send("Користувач створений успішно");
+    res.status(201).json("Користувач створений успішно");
   } catch (err) {
     console.error("Помилка при створенні користувача:", err);
-    res.status(500).send("Помилка при створенні користувача");
+    res.status(500).json("Помилка при створенні користувача");
   }
 });
 
