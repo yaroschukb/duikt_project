@@ -1,12 +1,9 @@
-import { HttpEventType } from '@angular/common/http';
 import { ApiService } from './../../services/api.service';
 import { Component } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzContentComponent } from 'ng-zorro-antd/layout';
-import { NzMessageComponent, NzMessageService } from 'ng-zorro-antd/message';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import {
-  NzUploadChangeParam,
-  NzUploadComponent,
   NzUploadFile,
   NzUploadModule,
   NzUploadXHRArgs,
@@ -28,7 +25,6 @@ const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
   selector: 'app-container',
   standalone: true,
   imports: [
-    NzMessageComponent,
     NzIconModule,
     NzContentComponent,
     NzUploadModule,
@@ -54,14 +50,14 @@ export class ContainerComponent {
     const result = this.httpService.uploadImageToServer(item).subscribe({
       next: (event: any) => {
         this.uploading = true;
-        if (event.type === HttpEventType.UploadProgress) {
-          const percentDone = Math.round((100 * event.loaded) / event.total);
-          console.log(`File is ${percentDone}% uploaded.`);
-          item.onProgress({ percent: percentDone });
-        } else if (event.type === HttpEventType.Response) {
-          console.log('File successfully uploaded!', event.body);
-          item.onSuccess(event.body, item.file, event);
-        }
+        // if (event.type === HttpEventType.UploadProgress) {
+        //   const percentDone = Math.round((100 * event.loaded) / event.total);
+        //   console.log(`File is ${percentDone}% uploaded.`);
+        //   item.onProgress({ percent: percentDone });
+        // } else if (event.type === HttpEventType.Response) {
+        //   console.log('File successfully uploaded!', event.body);
+        //   item.onSuccess(event.body, item.file, event);
+        // }
       },
       error: (error) => {
         this.uploading = false;
@@ -71,6 +67,7 @@ export class ContainerComponent {
       complete: () => {
         this.uploading = false;
         console.log('File upload complete.');
+        this.previewImage = '';
       },
     });
     return result;
@@ -102,8 +99,7 @@ export class ContainerComponent {
 
   handleUpload(): void {
     this.uploading = true;
-    console.log('handleUpload', this.fileList);
-    // this.imageUpload(this.fileList);
+    this.imageUpload(this.fileList);
   }
 
   beforeUpload = (file: NzUploadXHRArgs): any => {

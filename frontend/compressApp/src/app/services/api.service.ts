@@ -1,12 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpEvent,
-  HttpEventType,
-  HttpHeaders,
-  HttpResponse,
-} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -16,39 +9,37 @@ import { catchError } from 'rxjs/operators';
 export class ApiService {
   constructor(private http: HttpClient) {}
 
-  getCompressedPhoto(): Observable<any> {
-    return this.http.get<any>('/getphoto').pipe(
-      catchError(this.handleError) // Обробка помилок
-    );
+  getCompressedPhoto(): Observable<
+    { id: string; filename: string; data: string }[]
+  > {
+    return this.http
+      .get<any>('/api/getphoto')
+      .pipe(catchError(this.handleError));
   }
 
   uploadImageToServer(data: any): Observable<HttpEvent<any>> {
-    console.log('file in api service', data);
-    const formData = new FormData();
-    formData.append('image', data.file);
-    console.log('formdata in api service', formData);
-    return this.http.post('/api/upload', formData, {
+    return this.http.post('/api/upload', data, {
       reportProgress: true,
       observe: 'events',
-      headers: new HttpHeaders({
-        enctype: 'multipart/form-data',
-      }),
+      responseType: 'json',
+    });
+  }
+
+  deleteImageService(id: string): Observable<HttpEvent<any>> {
+    console.log(id);
+
+    return this.http.delete<HttpEvent<any>>(`/api/images/${id}`, {
+      observe: 'events',
     });
   }
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = '';
     if (error.error && error.error.message) {
-      // Client-side error
       errorMessage = `Client-side error: ${error.error.message}`;
     } else {
-      // Server-side error
       errorMessage = `Server-side error: ${error.status} - ${error.message}`;
     }
     return throwError(() => new Error(errorMessage));
-  }
-
-  getTestData(): string[] {
-    return ['data1', 'data2', 'data3'];
   }
 }

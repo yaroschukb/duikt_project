@@ -1,2 +1,14 @@
-<h3>Compressed photo1</h3>
-{{ photoList }}
+<div [hidden]="files.length <= 0">
+  <h3>Your Compressed photo</h3>
+  <div class="scrollable">
+    <div *ngFor="let file of updatedFiles">
+      <img
+        nz-image
+        width="100px"
+        height="100px"
+        nzSrc="{{ file.blobUrl }}"
+        alt="{{ file.filename }}"
+      />
+    </div>
+  </div>
+</div>
