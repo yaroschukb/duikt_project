@@ -18,13 +18,28 @@
         [alt]="file.filename"
       />
       <div class="image-actions" *ngIf="hoveredFile === file">
-        <button nz-button nzType="primary" (click)="viewImage(file)">
+        <button
+          nz-button
+          nzType="primary"
+          (click)="viewImage(file)"
+          class="preview-photo"
+        >
           <span nz-icon nzType="eye" nzTheme="outline"></span>
         </button>
-        <button nz-button nzType="default" (click)="downloadImage(file)">
+        <button
+          nz-button
+          nzType="default"
+          (click)="downloadImage(file)"
+          class="download-photo"
+        >
           <span nz-icon nzType="download" nzTheme="outline"></span>
         </button>
-        <button nz-button nzType="danger" (click)="deleteImage(file)">
+        <button
+          nz-button
+          nzType="danger"
+          (click)="deleteImage(file)"
+          class="delete-photo"
+        >
           <span nz-icon nzType="delete" nzTheme="outline"></span>
         </button>
       </div>

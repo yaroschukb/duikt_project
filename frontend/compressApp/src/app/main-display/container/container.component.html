@@ -22,6 +22,7 @@
     (click)="handleUpload()"
     [disabled]="fileList.length === 0"
     style="margin-top: 16px"
+    class="upload-btn"
   >
     {{ uploading ? "Uploading" : "Start Upload" }}
   </button>
@@ -36,3 +37,5 @@
     </ng-template>
   </nz-modal>
 </nz-content>
+
+<img src="assets/compress.png" class="test-image" alt="Test image" hidden />

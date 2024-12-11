@@ -9,7 +9,7 @@
       <button
         nz-button
         nzType="default"
-        class="header-btn"
+        class="header-btn log-in-btn"
         (click)="showModal(0)"
       >
         Log in
@@ -17,7 +17,7 @@
       <button
         nz-button
         nzType="primary"
-        class="header-btn"
+        class="header-btn sign-in-btn"
         (click)="showModal(1)"
       >
         Sign up
@@ -34,7 +34,12 @@
   [nzContent]="formSingUpContent"
 >
   <ng-template #formSingUpContent>
-    <form nz-form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+    <form
+      nz-form
+      [formGroup]="signUpForm"
+      (ngSubmit)="onSubmit()"
+      class="signUpForm"
+    >
       <nz-form-item>
         <nz-form-label [nzSpan]="6" nzRequired nzFor="username"
           >Username</nz-form-label
@@ -135,7 +140,7 @@
     <form
       nz-form
       [formGroup]="logInForm"
-      class="login-form"
+      class="logInForm"
       (ngSubmit)="onSubmit()"
     >
       <nz-form-item>
