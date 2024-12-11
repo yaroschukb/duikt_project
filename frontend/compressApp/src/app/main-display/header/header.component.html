@@ -6,8 +6,181 @@
       </a>
     </div>
     <div class="header-actions">
-      <button nz-button nzType="default" class="header-btn">Log in</button>
-      <button nz-button nzType="primary" class="header-btn">Sign up</button>
+      <button
+        nz-button
+        nzType="default"
+        class="header-btn"
+        (click)="showModal(0)"
+      >
+        Log in
+      </button>
+      <button
+        nz-button
+        nzType="primary"
+        class="header-btn"
+        (click)="showModal(1)"
+      >
+        Sign up
+      </button>
     </div>
   </div>
 </header>
+
+<nz-modal
+  [(nzVisible)]="isSignUpVisible"
+  nzTitle="Sign Up"
+  [nzFooter]="null"
+  (nzOnCancel)="handleCancel()"
+  [nzContent]="formSingUpContent"
+>
+  <ng-template #formSingUpContent>
+    <form nz-form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired nzFor="username"
+          >Username</nz-form-label
+        >
+        <nz-form-control [nzSpan]="14" [nzErrorTip]="usernameError">
+          <input
+            nz-input
+            id="username"
+            formControlName="username"
+            placeholder="Enter your username"
+          />
+          <ng-template #usernameError>
+            <span
+              *ngIf="
+                signUpForm.get('username')?.invalid &&
+                signUpForm.get('username')?.touched
+              "
+            >
+              Please enter a valid username.
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired nzFor="email"
+          >Email</nz-form-label
+        >
+        <nz-form-control [nzSpan]="14" [nzErrorTip]="emailError">
+          <input
+            nz-input
+            id="email"
+            formControlName="email"
+            placeholder="Enter your email"
+          />
+          <ng-template #emailError>
+            <span
+              *ngIf="
+                signUpForm.get('email')?.invalid &&
+                signUpForm.get('email')?.touched
+              "
+            >
+              Please enter a valid email.
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired nzFor="password"
+          >Password</nz-form-label
+        >
+        <nz-form-control [nzSpan]="14" [nzErrorTip]="passwordError">
+          <input
+            nz-input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+          <ng-template #passwordError>
+            <span
+              *ngIf="
+                signUpForm.get('password')?.invalid &&
+                signUpForm.get('password')?.touched
+              "
+            >
+              Please enter a valid password.
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="form-footer">
+        <button nz-button nzType="default" (click)="handleCancel()">
+          Cancel
+        </button>
+        <button
+          nz-button
+          nzType="primary"
+          [disabled]="signUpForm.invalid"
+          [nzLoading]="loading"
+        >
+          Sign Up
+        </button>
+      </div>
+    </form></ng-template
+  >
+</nz-modal>
+<nz-modal
+  [(nzVisible)]="isLogInVisible"
+  nzTitle="Sign Up"
+  [nzFooter]="null"
+  (nzOnCancel)="handleCancel()"
+  [nzContent]="formLogInContent"
+>
+  <ng-template #formLogInContent>
+    <form
+      nz-form
+      [formGroup]="logInForm"
+      class="login-form"
+      (ngSubmit)="onSubmit()"
+    >
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Please input your username!">
+          <nz-input-group nzPrefixIcon="user">
+            <input
+              type="text"
+              nz-input
+              formControlName="username"
+              placeholder="Username"
+            />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Please input your Password!">
+          <nz-input-group nzPrefixIcon="lock">
+            <input
+              type="password"
+              nz-input
+              formControlName="password"
+              placeholder="Password"
+            />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <div nz-row class="login-form-margin">
+        <div nz-col [nzSpan]="12">
+          <label nz-checkbox formControlName="remember">
+            <span>Remember me</span>
+          </label>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <a class="login-form-forgot">Forgot password</a>
+        </div>
+      </div>
+      <button
+        nz-button
+        class="login-form-button login-form-margin"
+        [nzType]="'primary'"
+      >
+        Log in
+      </button>
+      Or
+      <a>register now!</a>
+    </form>
+  </ng-template></nz-modal
+>
