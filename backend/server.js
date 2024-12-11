@@ -131,6 +131,25 @@ app.get("/api/getphoto", async (req, res) => {
     res.status(500).json({ message: "Помилка при отриманні зображень" });
   }
 });
+app.delete("/api/images/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Пошук і видалення зображення
+    const deletedImage = await Image.findByIdAndDelete(id);
+
+    if (!deletedImage) {
+      return res.status(404).json({ message: "Зображення не знайдено" });
+    }
+
+    res.status(200).json({
+      message: "Зображення успішно видалено",
+      deletedImage,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Помилка сервера", error });
+  }
+});
 
 // Роут для створення нового користувача
 app.post("/api/user", async (req, res) => {
