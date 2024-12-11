@@ -2,43 +2,51 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { CommonModule } from '@angular/common';
 import { NzImageModule } from 'ng-zorro-antd/image';
+import { ImageService } from '../../services/image.service';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzModalComponent } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-sider',
   standalone: true,
-  imports: [CommonModule, NzImageModule],
+  imports: [CommonModule, NzImageModule, NzIconModule, NzModalComponent],
   templateUrl: './sider.component.html',
   styleUrl: './sider.component.scss',
 })
 export class SiderComponent implements OnInit {
-  constructor(public httpService: ApiService) {}
+  constructor(
+    public httpService: ApiService,
+    public imageService: ImageService
+  ) {}
 
-  files: { filename: string; data: string }[] = [];
-  updatedFiles: { filename: string; blobUrl: string }[] = [];
-  ngOnInit(): any {
-    this.photoObjectConvert();
-    console.log(this.updatedFiles);
-  }
-  photoObjectConvert() {
-    this.httpService.getCompressedPhoto().subscribe((files) => {
-      this.updatedFiles = files.map(
-        (object: { filename: string; data: string }) => {
-          const { filename, data } = object;
-          const byteCharacters = atob(data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          const blob = new Blob([byteArray], { type: 'image/jpeg' });
-          const blobUrl = URL.createObjectURL(blob);
-
-          return {
-            filename,
-            blobUrl: blobUrl,
-          };
-        }
-      );
+  files: { id: string; filename: string; data: string }[] = [];
+  updatedFiles: { id: string; filename: string; url: string }[] = [];
+  ngOnInit(): void {
+    this.imageService.images$.subscribe((files) => {
+      this.updatedFiles = files; // Оновлюємо локальну змінну
     });
+    this.imageService.getPhotoFromServer();
+  }
+
+  hoveredFile: any = null;
+  previewImage: string | undefined = '';
+  previewVisible = false;
+  previewTitle: string = '';
+
+  viewImage(file: { url: string; filename: string }): void {
+    this.previewImage = file.url;
+    this.previewTitle = file.filename;
+    this.previewVisible = true;
+  }
+
+  downloadImage(file: { url: string; filename: string }): void {
+    const link = document.createElement('a');
+    link.href = file.url;
+    link.download = file.filename;
+    link.click();
+  }
+
+  deleteImage(file: { id: string; filename: string }): void {
+    this.updatedFiles = this.updatedFiles.filter((f) => f !== file);
   }
 }

@@ -1,14 +1,43 @@
-<div [hidden]="files.length <= 0">
-  <h3>Your Compressed photo</h3>
+<div class="container">
+  <div class="title-block">
+    <h3>Compressed Photo</h3>
+  </div>
+
   <div class="scrollable">
-    <div *ngFor="let file of updatedFiles">
+    <div
+      *ngFor="let file of updatedFiles"
+      class="image-container"
+      (mouseenter)="hoveredFile = file"
+      (mouseleave)="hoveredFile = null"
+    >
       <img
         nz-image
         width="100px"
         height="100px"
-        nzSrc="{{ file.blobUrl }}"
-        alt="{{ file.filename }}"
+        [nzSrc]="file.url"
+        [alt]="file.filename"
       />
+      <div class="image-actions" *ngIf="hoveredFile === file">
+        <button nz-button nzType="primary" (click)="viewImage(file)">
+          <span nz-icon nzType="eye" nzTheme="outline"></span>
+        </button>
+        <button nz-button nzType="default" (click)="downloadImage(file)">
+          <span nz-icon nzType="download" nzTheme="outline"></span>
+        </button>
+        <button nz-button nzType="danger" (click)="deleteImage(file)">
+          <span nz-icon nzType="delete" nzTheme="outline"></span>
+        </button>
+      </div>
     </div>
   </div>
+  <nz-modal
+    [nzVisible]="previewVisible"
+    [nzContent]="modalContent"
+    [nzFooter]="null"
+    (nzOnCancel)="previewVisible = false"
+  >
+    <ng-template #modalContent>
+      <img [src]="previewImage" alt="Preview" [ngStyle]="{ width: '100%' }" />
+    </ng-template>
+  </nz-modal>
 </div>

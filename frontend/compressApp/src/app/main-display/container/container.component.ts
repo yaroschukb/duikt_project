@@ -8,11 +8,14 @@ import {
   NzUploadModule,
   NzUploadXHRArgs,
 } from 'ng-zorro-antd/upload';
-import { Subscription, pipe } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { NzModalComponent, NzModalModule } from 'ng-zorro-antd/modal';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { CommonModule } from '@angular/common';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
+import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
+import { ImageService } from '../../services/image.service';
+
 const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -35,59 +38,62 @@ const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
     NzButtonComponent,
   ],
   templateUrl: './container.component.html',
-  styleUrls: ['./container.component.scss'], // Виправлено тут
+  styleUrls: ['./container.component.scss'],
 })
 export class ContainerComponent {
-  constructor(private msg: NzMessageService, private httpService: ApiService) {}
+  constructor(
+    private msg: NzMessageService,
+    private httpService: ApiService,
+    public imageService: ImageService
+  ) {}
+
+  ngOnInit(): void {}
 
   fileList: NzUploadFile[] = [];
   previewImage: any | undefined = '';
   previewVisible = false;
   uploading = false;
 
-  imageUpload = (item: any): Subscription => {
-    console.log('ITEM', item);
-    const result = this.httpService.uploadImageToServer(item).subscribe({
-      next: (event: any) => {
-        this.uploading = true;
-        // if (event.type === HttpEventType.UploadProgress) {
-        //   const percentDone = Math.round((100 * event.loaded) / event.total);
-        //   console.log(`File is ${percentDone}% uploaded.`);
-        //   item.onProgress({ percent: percentDone });
-        // } else if (event.type === HttpEventType.Response) {
-        //   console.log('File successfully uploaded!', event.body);
-        //   item.onSuccess(event.body, item.file, event);
-        // }
+  imageUpload = (item: NzUploadXHRArgs): Subscription => {
+    const formData = new FormData();
+    formData.append('image', item.file.originFileObj as unknown as Blob);
+
+    return this.httpService.uploadImageToServer(formData).subscribe({
+      next: (event: HttpEvent<any>) => {
+        if (event.type === HttpEventType.UploadProgress) {
+          const percentDone = Math.round(
+            (100 * (event.loaded || 0)) / (event.total || 1)
+          );
+          if (item.onProgress) {
+            item.onProgress({ percent: percentDone }, item.file);
+          }
+        } else if (event.type === HttpEventType.Response) {
+          if (event.status === 200 || event.status === 201) {
+            this.msg.success('Upload successfully.');
+            if (item.onSuccess) {
+              item.onSuccess(event.body, item.file, event);
+            }
+            this.imageService.getPhotoFromServer();
+          } else {
+            this.msg.error('Unexpected response from server.');
+            if (item.onError) {
+              item.onError(new Error('Unexpected response'), item.file);
+            }
+          }
+        }
       },
       error: (error) => {
-        this.uploading = false;
-        console.error('File upload failed:', error);
-        item.onError(error, item.file);
+        console.error('Error details:', error);
+        this.msg.error('Upload failed. Please try again later.');
+        if (item.onError) {
+          item.onError(error, item.file);
+        }
       },
       complete: () => {
         this.uploading = false;
-        console.log('File upload complete.');
-        this.previewImage = '';
       },
     });
-    return result;
   };
-
-  // handleChange(event: any): void {
-  //   const files = event.fileList;
-  //   this.fileList = files.map((file: NzUploadFile) => {
-  //     if (!file['preview'] && file.originFileObj) {
-  //       // Create a FileReader to read the file and generate a preview
-  //       const reader = new FileReader();
-  //       reader.onload = () => {
-  //         file['preview'] = reader.result as string;
-  //       };
-  //       reader.readAsDataURL(file.originFileObj);
-  //       this.previewImage = file['preview'];
-  //     }
-  //     return file;
-  //   });
-  // }
 
   handlePreview = async (file: NzUploadFile): Promise<void> => {
     if (!file.url && !file['preview']) {
@@ -98,11 +104,29 @@ export class ContainerComponent {
   };
 
   handleUpload(): void {
+    if (this.fileList.length === 0) {
+      this.msg.warning('No files selected for upload.');
+      return;
+    }
+
     this.uploading = true;
-    this.imageUpload(this.fileList);
+
+    this.fileList.forEach((file) => {
+      this.imageUpload({
+        file: file as any,
+        onProgress: file['onProgress'] || (() => {}),
+        onSuccess: file['onSuccess'] || (() => {}),
+        onError: file['onError'] || (() => {}),
+      } as NzUploadXHRArgs);
+    });
   }
 
-  beforeUpload = (file: NzUploadXHRArgs): any => {
-    console.log('File to upload', file);
+  beforeUpload = (file: NzUploadFile): boolean => {
+    this.fileList = [...this.fileList, file]; // Додаємо файл до списку
+    return false; // Блокуємо автоматичне завантаження
+  };
+
+  customRequest = (item: NzUploadXHRArgs): Subscription => {
+    return this.imageUpload(item); // Використовуємо кастомну функцію для завантаження
   };
 }
