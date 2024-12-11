@@ -57,7 +57,7 @@ export class ContainerComponent {
   imageUpload = (item: NzUploadXHRArgs): Subscription => {
     const formData = new FormData();
     formData.append('image', item.file.originFileObj as unknown as Blob);
-
+    this.uploading = true;
     return this.httpService.uploadImageToServer(formData).subscribe({
       next: (event: HttpEvent<any>) => {
         if (event.type === HttpEventType.UploadProgress) {
@@ -70,12 +70,15 @@ export class ContainerComponent {
         } else if (event.type === HttpEventType.Response) {
           if (event.status === 200 || event.status === 201) {
             this.msg.success('Upload successfully.');
+            this.uploading = false;
+            this.fileList = [];
             if (item.onSuccess) {
               item.onSuccess(event.body, item.file, event);
             }
             this.imageService.getPhotoFromServer();
           } else {
             this.msg.error('Unexpected response from server.');
+            this.uploading = false;
             if (item.onError) {
               item.onError(new Error('Unexpected response'), item.file);
             }
@@ -88,6 +91,7 @@ export class ContainerComponent {
         if (item.onError) {
           item.onError(error, item.file);
         }
+        this.uploading = false;
       },
       complete: () => {
         this.uploading = false;

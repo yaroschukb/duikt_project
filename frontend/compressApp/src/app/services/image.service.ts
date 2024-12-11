@@ -8,8 +8,8 @@ import { ApiService } from './api.service';
 export class ImageService {
   private imagesSubject = new BehaviorSubject<
     { id: string; filename: string; url: string }[]
-  >([]); // Список зображень
-  images$ = this.imagesSubject.asObservable(); // Потік для підписників
+  >([]);
+  images$ = this.imagesSubject.asObservable();
 
   constructor(public httpService: ApiService) {}
 
@@ -45,13 +45,5 @@ export class ImageService {
   // Оновити список зображень
   updateImages(newImages: string[]): void {
     // this.imagesSubject.next(newImages);
-  }
-
-  // Видалити зображення
-  deleteImage(image: string): void {
-    // const currentImages = this.imagesSubject.value.filter(
-    //   // (img) => img !== image
-    // );
-    // this.imagesSubject.next(currentImages);
   }
 }

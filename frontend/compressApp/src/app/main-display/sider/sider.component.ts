@@ -23,7 +23,7 @@ export class SiderComponent implements OnInit {
   updatedFiles: { id: string; filename: string; url: string }[] = [];
   ngOnInit(): void {
     this.imageService.images$.subscribe((files) => {
-      this.updatedFiles = files; // Оновлюємо локальну змінну
+      this.updatedFiles = files;
     });
     this.imageService.getPhotoFromServer();
   }
@@ -47,6 +47,7 @@ export class SiderComponent implements OnInit {
   }
 
   deleteImage(file: { id: string; filename: string }): void {
-    this.updatedFiles = this.updatedFiles.filter((f) => f !== file);
+    this.httpService.deleteImage(file.id);
+    this.imageService.getPhotoFromServer();
   }
 }

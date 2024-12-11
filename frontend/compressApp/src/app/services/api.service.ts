@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -25,11 +25,10 @@ export class ApiService {
     });
   }
 
-  deleteImageService(id: string): Observable<HttpEvent<any>> {
-    console.log(id);
-
-    return this.http.delete<HttpEvent<any>>(`/api/images/${id}`, {
-      observe: 'events',
+  deleteImage(id: string): void {
+    this.http.delete(`/api/images/${id}`).subscribe({
+      next: (response) => console.log('Image deleted successfully', response),
+      error: (error) => console.error('Error deleting image:', error),
     });
   }
 
