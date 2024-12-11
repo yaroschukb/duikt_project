@@ -24,6 +24,14 @@ services:
       - app_network
     depends_on:
       - mongo
+  selenium-chrome:
+    image: selenium/standalone-chrome
+    ports:
+      - "4444:4444"
+  selenium-firefox:
+    image: selenium/standalone-firefox
+    ports:
+      - "4445:4444"
 
 volumes:
   mongo_data:

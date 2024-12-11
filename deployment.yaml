@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compress-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: compress-app
+  template:
+    metadata:
+      labels:
+        app: compress-app
+    spec:
+      containers:
+        - name: compress-app
+          image: compress-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
