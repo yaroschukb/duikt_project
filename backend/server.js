@@ -2,9 +2,11 @@ const express = require("express");
 const multer = require("multer");
 const sharp = require("sharp");
 const cors = require("cors");
+const morgan = require("morgan");
 const mongoose = require("mongoose");
 const { collectDefaultMetrics, register } = require("prom-client");
 const { Counter, Gauge } = require("prom-client");
+const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
 
 // Створення метрик для Prometheus
 const uploadCounter = new Counter({
@@ -17,14 +19,44 @@ const compressionDurationGauge = new Gauge({
   help: "Time taken to compress an image",
 });
 
-// Підключення до MongoDB
-mongoose.connect(
-  "mongodb://admin:password@localhost:27017/my-appDB?authSource=admin"
-);
+// Запит на отримання секретних ключів для підключення до БД
+async function getDbCredentials() {
+  const client = new SecretManagerServiceClient();
+
+  try {
+    const [version] = await client.accessSecretVersion({
+      name: `projects/secretproject-444511/secrets/mongo-db-credentials/versions/latest`,
+    });
+
+    const payload = version.payload.data.toString("utf8");
+    const credentials = JSON.parse(payload);
+    console.log("Secret available!");
+    return credentials;
+  } catch (error) {
+    console.error("Failed to access secret:", error);
+    throw error;
+  }
+}
+
+// Приєднання до БД
+async function connectToDatabase() {
+  const credentials = await getDbCredentials();
+
+  const uri = `mongodb://${credentials.username}:${credentials.password}@localhost:27017/my-appDB?authSource=admin`;
+
+  try {
+    await mongoose.connect(uri);
+    console.log("Connected to MongoDB successfully");
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+  }
+}
+
+connectToDatabase();
 
 const db = mongoose.connection;
 db.once("open", async () => {
-  console.log("Підключено до бази даних MongoDB");
+  console.log("Connected to MongoDB!");
 
   // Перевірка та створення колекції `compressed_image`
   const compressedImageCollectionExists = await db.db
@@ -32,7 +64,7 @@ db.once("open", async () => {
     .hasNext();
   if (!compressedImageCollectionExists) {
     await db.db.createCollection("compressed_image");
-    console.log("Колекція `compressed_image` створена");
+    console.log("`compressed_image` collection have created!");
   }
 
   // Перевірка та створення колекції `user`
@@ -41,7 +73,7 @@ db.once("open", async () => {
     .hasNext();
   if (!userCollectionExists) {
     await db.db.createCollection("user");
-    console.log("Колекція `user` створена");
+    console.log("`user` collection have created");
   }
 });
 
@@ -61,18 +93,14 @@ const Image = mongoose.model("compressed_image", imageSchema);
 const User = mongoose.model("user", userSchema);
 
 const app = express();
+
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "localhost";
 
-// Налаштування multer для зберігання завантажених зображень в пам'яті
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
 app.use(cors());
-
-// Реєстрація базових метрик Prometheus
-collectDefaultMetrics();
-
+app.use(morgan("tiny"));
 // Роут для отримання метрик Prometheus
 app.get("/metrics", async (req, res) => {
   res.set("Content-Type", register.contentType);
@@ -84,7 +112,7 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
   const file = req.file;
 
   if (!file) {
-    return res.status(400).json("Немає файлу для завантаження");
+    return res.status(400).json("No photo to download");
   }
 
   const start = Date.now();
@@ -127,10 +155,13 @@ app.get("/api/getphoto", async (req, res) => {
 
     res.json(imageBuffers);
   } catch (err) {
-    console.error("Помилка при отриманні зображень:", err);
-    res.status(500).json({ message: "Помилка при отриманні зображень" });
+    console.error("An error occurred while receiving images:", err);
+    res
+      .status(500)
+      .json({ message: "An error occurred while receiving images" });
   }
 });
+// Роут для видалення зображеня
 app.delete("/api/images/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -139,15 +170,15 @@ app.delete("/api/images/:id", async (req, res) => {
     const deletedImage = await Image.findByIdAndDelete(id);
 
     if (!deletedImage) {
-      return res.status(404).json({ message: "Зображення не знайдено" });
+      return res.status(404).json({ message: "Photo not found" });
     }
 
     res.status(200).json({
-      message: "Зображення успішно видалено",
+      message: "Photo delete successfully",
       deletedImage,
     });
   } catch (error) {
-    res.status(500).json({ message: "Помилка сервера", error });
+    res.status(500).json({ message: "Server error", error });
   }
 });
 
@@ -162,10 +193,10 @@ app.post("/api/user", async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).json("Користувач створений успішно");
+    res.status(201).json("User have created successfull!");
   } catch (err) {
-    console.error("Помилка при створенні користувача:", err);
-    res.status(500).json("Помилка при створенні користувача");
+    console.error("Error creating user:", err);
+    res.status(500).json("Error creating user");
   }
 });
 
