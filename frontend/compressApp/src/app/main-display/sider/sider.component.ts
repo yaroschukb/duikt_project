@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { ImageService } from '../../services/image.service';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzModalComponent } from 'ng-zorro-antd/modal';
+import { NzModalComponent, NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-sider',
@@ -12,6 +12,7 @@ import { NzModalComponent } from 'ng-zorro-antd/modal';
   imports: [CommonModule, NzImageModule, NzIconModule, NzModalComponent],
   templateUrl: './sider.component.html',
   styleUrl: './sider.component.scss',
+  providers: [NzModalService],
 })
 export class SiderComponent implements OnInit {
   constructor(

@@ -9,7 +9,11 @@ import {
   NzUploadXHRArgs,
 } from 'ng-zorro-antd/upload';
 import { Subscription, of } from 'rxjs';
-import { NzModalComponent, NzModalModule } from 'ng-zorro-antd/modal';
+import {
+  NzModalComponent,
+  NzModalModule,
+  NzModalService,
+} from 'ng-zorro-antd/modal';
 import { NzImageModule } from 'ng-zorro-antd/image';
 import { CommonModule } from '@angular/common';
 import { NzButtonComponent } from 'ng-zorro-antd/button';
@@ -39,6 +43,7 @@ const getBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
   ],
   templateUrl: './container.component.html',
   styleUrls: ['./container.component.scss'],
+  providers: [NzModalService],
 })
 export class ContainerComponent {
   constructor(
