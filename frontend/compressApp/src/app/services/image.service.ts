@@ -41,9 +41,4 @@ export class ImageService {
     const currentImages = this.imagesSubject.value;
     // this.imagesSubject.next([...currentImages, image]);
   }
-
-  // Оновити список зображень
-  updateImages(newImages: string[]): void {
-    // this.imagesSubject.next(newImages);
-  }
 }

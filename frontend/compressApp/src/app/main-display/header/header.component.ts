@@ -9,7 +9,7 @@ import {
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzModalComponent } from 'ng-zorro-antd/modal';
+import { NzModalComponent, NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-header',
@@ -24,6 +24,7 @@ import { NzModalComponent } from 'ng-zorro-antd/modal';
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
+  providers: [NzModalService],
 })
 export class HeaderComponent {
   isSignUpVisible = false;

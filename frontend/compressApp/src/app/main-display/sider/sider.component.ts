@@ -21,6 +21,7 @@ export class SiderComponent implements OnInit {
 
   files: { id: string; filename: string; data: string }[] = [];
   updatedFiles: { id: string; filename: string; url: string }[] = [];
+
   ngOnInit(): void {
     this.imageService.images$.subscribe((files) => {
       this.updatedFiles = files;
